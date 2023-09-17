@@ -1,0 +1,58 @@
+spring:
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: ${H2_PATH}
+
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    show_sql: true
+
+jwt:
+  secret-key: ${SECRET_KEY}
+  access-token-expire-time: ${ACCESS_TOKEN_EXPIRE_TIME}
+  refresh-token-expire-time: ${REFRESH_TOKEN_EXPIRE_TIME}
+
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    url:
+      auth-url: ${KAKAO_AUTH_URL}
+      api-url: ${KAKAO_API_URL}
+      redirect-url: ${KAKAO_REDIRECT_URL}
+
+  naver:
+    client-id: ${NAVER_CLIENT_ID}
+    client-secret: ${NAVER_CLIENT_SECRET}
+    state: ${NAVER_STATE}
+    url:
+      auth-url: ${NAVER_AUTH_URL}
+      api-url: ${NAVER_API_URL}
+      redirect-url: ${NAVER_REDIRECT_URL}
+
+springdoc:
+  swagger-ui:
+    path: ${SPRINGDOC_SWAGGER_UI_PATH}
+
+cloud:
+  aws:
+    s3:
+      bucket: ${CLOUD_AWS_S3_BUCKET_NAME}
+    credentials:
+      access-key: ${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
+      secret-key: ${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
+    region:
+      static: ${CLOUD_AWS_REGION_STATIC}
+      auto: false
+    stack:
+      auto: false

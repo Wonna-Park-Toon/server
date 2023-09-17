@@ -1,0 +1,79 @@
+name : wonna-park-toon CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+      
+defaults:
+  run:
+    working-directory: wnp-server
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    permissions:
+     checks: write
+     pull-requests: write
+    
+    steps:
+     - name: 레포지토리 체크아웃
+       uses: actions/checkout@v3
+
+     - name: env 파일 생성
+       run: echo "test" >> .env
+       working-directory: wnp-server/src/main/resources
+      
+     - name: 그레이들 캐싱
+       id: gradle-cache
+       uses: actions/cache@v3
+       with: 
+         path: |
+           ~/.gradle/caches
+           ~/.gradle/wrapper
+         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+         restore-keys: |
+            ${{ runner.os }}-gradle-
+            
+     - if: steps.gradle-cache.outputs.cache-hit == 'true'
+       run: echo 'gradle cache hit!'
+     - if: steps.gradle-cache.outputs.cache-hit != 'true'
+       run: echo 'gradle cache missed!'
+
+     - name: JDK 17 설치
+       uses: actions/setup-java@v3
+       with:
+         java-version: '17'
+         distribution: 'zulu'
+         cache: gradle
+         
+     - name: 그레이들 권한 부여
+       run: chmod +x gradlew
+
+     - name: 그레이들 테스트 실행
+       run: ./gradlew test
+
+     - name: 테스트 결과를 PR 코멘트에 등록
+       uses: EnricoMi/publish-unit-test-result-action@v2
+       if: always()
+       with:
+          files: '**/build/test-results/test/TEST-*.xml'
+
+     - name: 테스트 실패 시 Check 코멘트 등록.
+       uses: mikepenz/action-junit-report@v3
+       if: always()
+       with:
+         report_paths: '**/build/test-results/test/TEST-*.xml'
+
+     - name: CI가 종료되면 Slack으로 알림
+       uses: 8398a7/action-slack@v3
+       with:
+         status: ${{ job.status }}
+         author_name: CI 결과 알림
+         fields: repo, message, commit, author, action, eventName, ref, workflow, job, took
+       env:
+         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+       if: always()
+     
