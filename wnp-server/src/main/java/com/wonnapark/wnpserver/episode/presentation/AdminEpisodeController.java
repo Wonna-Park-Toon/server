@@ -8,6 +8,7 @@ import com.wonnapark.wnpserver.episode.dto.request.EpisodeReleaseDateTimeUpdateR
 import com.wonnapark.wnpserver.episode.dto.request.EpisodeThumbnailUpdateRequest;
 import com.wonnapark.wnpserver.episode.dto.request.EpisodeTitleUpdateRequest;
 import com.wonnapark.wnpserver.episode.dto.request.EpisodeUrlsUpdateRequest;
+import com.wonnapark.wnpserver.episode.dto.request.LastEpisodeUrlUpdateRequest;
 import com.wonnapark.wnpserver.episode.dto.response.EpisodeCreationResponse;
 import com.wonnapark.wnpserver.episode.dto.response.EpisodeImagesUploadResponse;
 import com.wonnapark.wnpserver.global.auth.Admin;
@@ -44,7 +45,7 @@ public class AdminEpisodeController {
     private final EpisodeManageUseCase episodeManageUseCase;
     private final EpisodeImageService episodeImageService;
 
-    @Admin
+//    @Admin
     @PostMapping("/images")
     @ResponseStatus(CREATED)
     public ApiResponse<EpisodeImagesUploadResponse> createEpisodeImages(
@@ -69,7 +70,7 @@ public class AdminEpisodeController {
         ));
     }
 
-    @Admin
+//    @Admin
     @PostMapping
     @ResponseStatus(CREATED)
     public ApiResponse<EpisodeCreationResponse> createEpisode(
@@ -84,6 +85,7 @@ public class AdminEpisodeController {
 
         return ApiResponse.from(new EpisodeCreationResponse(episodeId));
     }
+
 
     @Admin
     @PatchMapping("{id}/title")
@@ -113,14 +115,21 @@ public class AdminEpisodeController {
         episodeManageUseCase.updateEpisodeReleaseDateTime(id, request);
     }
 
-    @Admin
+//    @Admin
     @PatchMapping("/{id}/image-urls")
     @ResponseStatus(OK)
     public void updateEpisodeUrls(@PathVariable Long id, @RequestBody @Valid EpisodeUrlsUpdateRequest request) {
         episodeManageUseCase.updateEpisodeUrls(id, request);
     }
 
-    @Admin
+//    @Admin
+    @PatchMapping("/{id}/last-image-url")
+    @ResponseStatus(OK)
+    public void updateLastEpisodeUrl(@PathVariable Long id, @RequestBody @Valid LastEpisodeUrlUpdateRequest request) {
+        episodeManageUseCase.updateLastEpisodeUrl(id, request);
+    }
+
+//    @Admin
     @DeleteMapping("/{id}")
     @ResponseStatus(OK)
     public void deleteEpisode(@PathVariable Long id) {

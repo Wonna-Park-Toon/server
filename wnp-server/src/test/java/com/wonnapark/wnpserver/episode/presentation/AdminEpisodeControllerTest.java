@@ -47,7 +47,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.partWith
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -313,7 +312,7 @@ class AdminEpisodeControllerTest extends ControllerTestConfig {
                                 fieldWithPath("data.thumbnailUrl").description("썸네일 URL"),
                                 fieldWithPath("data.urls[]").description("에피소드 이미지 URLS")
                         )
-                )).andDo(print());
+                ));
     }
 
     private EpisodeCreationRequest episodeCreationRequest() {
@@ -342,10 +341,6 @@ class AdminEpisodeControllerTest extends ControllerTestConfig {
 
     private EpisodeUrlsUpdateRequest episodeUrlsUpdateRequest() {
         return Instancio.create(EpisodeUrlsUpdateRequest.class);
-    }
-
-    private EpisodeImagesUploadResponse episodeImagesUploadResponse() {
-        return Instancio.create(EpisodeImagesUploadResponse.class);
     }
 
 }

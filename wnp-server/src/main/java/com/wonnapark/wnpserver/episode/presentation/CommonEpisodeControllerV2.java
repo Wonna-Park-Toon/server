@@ -8,7 +8,6 @@ import com.wonnapark.wnpserver.global.response.ApiResponse;
 import com.wonnapark.wnpserver.global.response.PageResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@RequestMapping("/api/v1/guest/episode")
+@RequestMapping("/api/v2/guest/episode")
 @RequiredArgsConstructor
-public class CommonEpisodeController {
+public class CommonEpisodeControllerV2 {
 
     private final EpisodeFindUseCase episodeFindUseCase;
 
@@ -31,7 +30,7 @@ public class CommonEpisodeController {
             @PathVariable Long episodeId,
             HttpServletRequest request
     ) {
-        EpisodeDetailFormResponse episodeDetailForm = episodeFindUseCase.findEpisodeDetailForm(getClientIP(request), episodeId);
+        EpisodeDetailFormResponse episodeDetailForm = episodeFindUseCase.findEpisodeDetailFormV2(getClientIP(request), episodeId);
         return ApiResponse.from(episodeDetailForm);
     }
 

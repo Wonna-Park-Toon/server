@@ -44,8 +44,7 @@ public class DefaultWebtoonController {
 
         if(orderOption.equals(OrderOption.VIEW)){
             data = defaultWebtoonService.findWebtoonsByPublishDayInView(publishDay);
-        }
-        else if (orderOption.equals(OrderOption.POPULARITY)){
+        } else if (orderOption.equals(OrderOption.POPULARITY)) {
             data = defaultWebtoonService.findWebtoonsByPublishDayInPopularity(publishDay);
         }
 

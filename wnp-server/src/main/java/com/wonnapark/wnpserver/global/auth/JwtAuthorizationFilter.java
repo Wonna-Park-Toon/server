@@ -41,7 +41,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 "/h2-console",
                 "/swagger-ui/",
                 "/v3/api-docs",
-                "/wonna-park.json"
+                "/wonna-park.json",
+                "/api"
         };
         String path = request.getRequestURI();
         return Arrays.stream(blackList).anyMatch(path::startsWith);

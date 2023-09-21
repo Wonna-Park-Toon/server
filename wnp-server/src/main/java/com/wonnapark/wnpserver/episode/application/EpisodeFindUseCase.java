@@ -13,6 +13,10 @@ public interface EpisodeFindUseCase {
 
     EpisodeDetailFormResponse findEpisodeDetailForm(String ip, Long episodeId);
 
+    EpisodeDetailFormResponse findEpisodeDetailFormV2(String ip, Long episodeId);
+
     EpisodeDetailFormResponse findEpisodeDetailForm(Long userId, Long episodeId);
+
+    EpisodeDetailFormResponse findEpisodeDetailFormV2(Long userId, Long episodeId);
 
 }

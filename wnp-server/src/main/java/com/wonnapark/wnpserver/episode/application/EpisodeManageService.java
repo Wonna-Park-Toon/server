@@ -1,8 +1,10 @@
 package com.wonnapark.wnpserver.episode.application;
 
 import com.wonnapark.wnpserver.episode.Episode;
+import com.wonnapark.wnpserver.episode.EpisodeV2;
 import com.wonnapark.wnpserver.episode.dto.request.*;
 import com.wonnapark.wnpserver.episode.infrastructure.EpisodeRepository;
+import com.wonnapark.wnpserver.episode.infrastructure.EpisodeRepositoryV2;
 import com.wonnapark.wnpserver.webtoon.Webtoon;
 import com.wonnapark.wnpserver.webtoon.infrastructure.WebtoonRepository;
 import jakarta.persistence.EntityExistsException;
@@ -20,10 +22,22 @@ import static com.wonnapark.wnpserver.episode.EpisodeErrorMessage.*;
 public class EpisodeManageService implements EpisodeManageUseCase {
 
     private final EpisodeRepository episodeRepository;
+    private final EpisodeRepositoryV2 episodeRepositoryV2;
     private final WebtoonRepository webtoonRepository;
 
     @Override
     public Long createEpisode(Long webtoonId, EpisodeCreationRequest request) {
+        if (episodeRepository.existsByWebtoonIdAndTitle(webtoonId, request.title())) {
+            throw new EntityExistsException(DUPLICATED_EPISODE_TITLE.getMessage(webtoonId, request.title()));
+        }
+        Webtoon webtoon = webtoonRepository.findById(webtoonId)
+                .orElseThrow(() -> new EntityNotFoundException(WEBTOON_NOT_FOUND.getMessage(webtoonId)));
+        Episode newEpisode = request.toEntity(webtoon);
+        return episodeRepository.save(newEpisode).getId();
+    }
+
+    @Override
+    public Long createEpisodeV2(Long webtoonId, EpisodeCreationRequestV2 request) {
         if (episodeRepository.existsByWebtoonIdAndTitle(webtoonId, request.title())) {
             throw new EntityExistsException(DUPLICATED_EPISODE_TITLE.getMessage(webtoonId, request.title()));
         }
@@ -64,12 +78,23 @@ public class EpisodeManageService implements EpisodeManageUseCase {
     }
 
     @Override
+    public void updateLastEpisodeUrl(Long episodeId, LastEpisodeUrlUpdateRequest request) {
+        EpisodeV2 episode = findEpisodeByIdV2(episodeId);
+        episode.changeLastEpisodeUrl(request.lastEpisodeUrl());
+    }
+
+    @Override
     public void deleteEpisode(Long episodeId) {
         episodeRepository.deleteById(episodeId);
     }
 
     private Episode findEpisodeById(Long episodeId) {
         return episodeRepository.findById(episodeId)
+                .orElseThrow(() -> new EntityNotFoundException(EPISODE_NOT_FOUND.getMessage(episodeId)));
+    }
+
+    private EpisodeV2 findEpisodeByIdV2(Long episodeId) {
+        return episodeRepositoryV2.findById(episodeId)
                 .orElseThrow(() -> new EntityNotFoundException(EPISODE_NOT_FOUND.getMessage(episodeId)));
     }
 

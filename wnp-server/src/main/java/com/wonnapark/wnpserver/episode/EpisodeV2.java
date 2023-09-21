@@ -22,11 +22,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(name = "episodes")
+@Table(name = "episodes_v2")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Episode extends BaseEntity {
+public class EpisodeV2 extends BaseEntity {
 
     private static final int MAX_TITLE_LENGTH = 35;
     private static final int MAX_ARTIST_COMMENT_LENGTH = 100;
@@ -51,25 +51,22 @@ public class Episode extends BaseEntity {
     @Column(name = "view_count", nullable = false)
     private long viewCount;
 
-//    @Column(name = "last_episode_url")
-//    private String lastEpisodeUrl;
+    @Column(name = "last_episode_url")
+    private String lastEpisodeUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "webtoon_id", nullable = false)
     private Webtoon webtoon;
 
-    @OneToMany(mappedBy = "episode", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<EpisodeUrl> episodeUrls = new ArrayList<>();
-
     @Builder
-    private Episode(String title, LocalDateTime releaseDateTime, String thumbnail, String artistComment, Webtoon webtoon) {
+    private EpisodeV2(String title, LocalDateTime releaseDateTime, String thumbnail, String artistComment, String lastEpisodeUrl, Webtoon webtoon) {
         this.title = title;
         this.releaseDateTime = releaseDateTime;
         this.thumbnail = thumbnail;
         this.artistComment = artistComment;
         this.viewCount = 0;
         this.webtoon = webtoon;
-//        this.lastEpisodeUrl = lastEpisodeUrl;
+        this.lastEpisodeUrl = lastEpisodeUrl;
     }
 
     public void changeTitle(String title) {
@@ -88,17 +85,8 @@ public class Episode extends BaseEntity {
         this.releaseDateTime = releaseDateTime;
     }
 
-    public void changeEpisodeUrls(List<EpisodeUrl> episodeUrls) {
-        this.episodeUrls.clear();
-        setEpisodeUrls(episodeUrls);
+    public void changeLastEpisodeUrl(String lastEpisodeUrl) {
+        this.lastEpisodeUrl = lastEpisodeUrl;
     }
-
-    public void setEpisodeUrls(List<EpisodeUrl> episodeUrls) {
-        episodeUrls.forEach(episodeUrl -> episodeUrl.setEpisode(this));
-    }
-
-//    public void changeLastEpisodeUrl(String lastEpisodeUrl) {
-//        this.lastEpisodeUrl = lastEpisodeUrl;
-//    }
 
 }
