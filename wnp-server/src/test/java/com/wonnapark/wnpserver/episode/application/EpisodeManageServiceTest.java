@@ -143,13 +143,12 @@ class EpisodeManageServiceTest {
     void deleteEpisode() {
         // given
         Episode episode = mock(Episode.class);
-        given(episodeRepository.findById(any(Long.class))).willReturn(Optional.of(episode));
 
         // when
         episodeService.deleteEpisode(episode.getId());
 
         // then
-        then(episode).should(atMostOnce()).delete();
+        then(episodeRepository).should(atMostOnce()).deleteById(episode.getId());
     }
 
 }

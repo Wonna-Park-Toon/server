@@ -1,26 +1,18 @@
 package com.wonnapark.wnpserver.auth.presentation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wonnapark.wnpserver.auth.application.AuthenticationResolver;
 import com.wonnapark.wnpserver.auth.dto.AuthTokenResponse;
+import com.wonnapark.wnpserver.config.ControllerTestConfig;
 import com.wonnapark.wnpserver.global.auth.AuthFixtures;
-import com.wonnapark.wnpserver.global.auth.AuthorizedArgumentResolver;
 import com.wonnapark.wnpserver.global.response.ApiResponse;
 import com.wonnapark.wnpserver.oauth.OAuthProvider;
-import com.wonnapark.wnpserver.oauth.application.OAuthLoginService;
 import com.wonnapark.wnpserver.oauth.dto.request.KakaoLoginRequest;
 import com.wonnapark.wnpserver.oauth.dto.request.NaverLoginRequest;
-import com.wonnapark.wnpserver.oauth.presentation.OAuthController;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.resourceDetails;
@@ -34,24 +26,12 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@AutoConfigureRestDocs
-@WebMvcTest(OAuthController.class)
-class OAuthControllerTest {
+class OAuthControllerTest extends ControllerTestConfig {
 
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @MockBean
-    OAuthLoginService oAuthLoginService;
-
-    @MockBean
-    AuthenticationResolver authenticationResolver;
-
-    @MockBean
-    AuthorizedArgumentResolver authorizedArgumentResolver;
+    @BeforeEach
+    void setUp() throws Exception {
+        given(jwtAuthenticationInterceptor.preHandle(any(), any(), any())).willReturn(true);
+    }
 
     @ParameterizedTest
     @EnumSource(value = OAuthProvider.class)
@@ -139,6 +119,5 @@ class OAuthControllerTest {
                         )
                 );
     }
-
 
 }

@@ -1,26 +1,17 @@
 package com.wonnapark.wnpserver.auth.presentation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wonnapark.wnpserver.auth.application.AuthenticationResolver;
-import com.wonnapark.wnpserver.auth.application.JwtTokenService;
 import com.wonnapark.wnpserver.auth.config.TokenConstants;
 import com.wonnapark.wnpserver.auth.dto.AuthTokenRequest;
 import com.wonnapark.wnpserver.auth.dto.AuthTokenResponse;
+import com.wonnapark.wnpserver.config.ControllerTestConfig;
 import com.wonnapark.wnpserver.global.auth.AuthFixtures;
 import com.wonnapark.wnpserver.global.auth.Authentication;
-import com.wonnapark.wnpserver.global.auth.AuthorizedArgumentResolver;
 import com.wonnapark.wnpserver.global.common.UserInfo;
 import com.wonnapark.wnpserver.global.response.ApiResponse;
-import com.wonnapark.wnpserver.oauth.application.OAuthLogoutService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.resourceDetails;
@@ -37,27 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureRestDocs
-@WebMvcTest(AuthController.class)
-class AuthControllerTest {
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @MockBean
-    OAuthLogoutService oAuthLogoutService;
-
-    @MockBean
-    JwtTokenService jwtTokenService;
-
-    @MockBean
-    AuthenticationResolver authenticationResolver;
-
-    @MockBean
-    AuthorizedArgumentResolver authorizedArgumentResolver;
+class AuthControllerTest extends ControllerTestConfig {
 
     @Test
     @DisplayName("인증 정보로 액세스 토큰과 리프레시 토큰을 재발급한다.")
@@ -69,13 +40,16 @@ class AuthControllerTest {
 
         willDoNothing().given(authenticationResolver).validateAccessToken(any());
         given(authenticationResolver.extractAuthentication(any())).willReturn(authentication);
+        willDoNothing().given(authenticationResolver).validateRefreshToken(any(), any());
+
+        given(jwtAuthenticationInterceptor.preHandle(any(), any(), any())).willReturn(true);
 
         given(jwtTokenService.generateAuthToken(any(AuthTokenRequest.class))).willReturn(authTokenResponse);
 
         // when // then
         mockMvc.perform(get("/api/v1/auth/reissue")
-                        .header(HttpHeaders.AUTHORIZATION, "accessToken")
-                        .header(TokenConstants.REFRESH_TOKEN, "refreshToken"))
+                        .header(HttpHeaders.AUTHORIZATION, TOKEN)
+                        .header(TokenConstants.REFRESH_TOKEN, TOKEN))
                 .andExpect(status().isCreated())
                 .andExpect(content().string(objectMapper.writeValueAsString(response)))
                 .andDo(document("authToken-reissue",
@@ -108,6 +82,8 @@ class AuthControllerTest {
         given(authenticationResolver.extractAuthentication(any())).willReturn(authentication);
         willDoNothing().given(authenticationResolver).validateRefreshToken(any(), any());
 
+        given(jwtAuthenticationInterceptor.preHandle(any(), any(), any())).willReturn(true);
+
         given(authorizedArgumentResolver.supportsParameter(any())).willReturn(true);
         given(authorizedArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(userInfo);
 
@@ -115,8 +91,8 @@ class AuthControllerTest {
 
         // when // then
         mockMvc.perform(get("/api/v1/auth/logout")
-                        .header(HttpHeaders.AUTHORIZATION, "accessToken")
-                        .header(TokenConstants.REFRESH_TOKEN, "refreshToken"))
+                        .header(HttpHeaders.AUTHORIZATION, TOKEN)
+                        .header(TokenConstants.REFRESH_TOKEN, TOKEN))
                 .andExpect(status().isNoContent())
                 .andDo(document("auth-logout",
                                 resourceDetails().tag("토큰").description("토큰 로그아웃 처리"),

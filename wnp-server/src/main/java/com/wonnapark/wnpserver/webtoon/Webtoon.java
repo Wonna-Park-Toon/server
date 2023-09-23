@@ -94,6 +94,7 @@ public class Webtoon extends BaseEntity {
 
     /**
      * Webtoon thumbnail URL을 사로운 값으로 변경하는 메서드
+     *
      * @param thumbnail 새로운 썸네일 URL
      */
     public void changeThumbnail(String thumbnail) {
@@ -105,9 +106,7 @@ public class Webtoon extends BaseEntity {
      */
     public boolean isXRated() {
 
-        if (this.ageRating.equals(AgeRating.OVER_18)) return true;
-
-        return false;
+        return this.ageRating.equals(AgeRating.OVER_18);
     }
 
     public void delete() {

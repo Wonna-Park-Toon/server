@@ -1,6 +1,6 @@
 package com.wonnapark.wnpserver.episode.application;
 
-import com.wonnapark.wnpserver.episode.dto.response.EpisodeMediaUploadResponse;
+import com.wonnapark.wnpserver.episode.dto.response.EpisodeImagesUploadResponse;
 import com.wonnapark.wnpserver.media.S3MediaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ public class EpisodeImageService {
 
     private final S3MediaService s3MediaService;
 
-    public EpisodeMediaUploadResponse uploadEpisodeMedia(String webtoonId, File thumbnail, List<File> episodeImages) {
-        return new EpisodeMediaUploadResponse(
+    public EpisodeImagesUploadResponse uploadEpisodeMedia(String webtoonId, File thumbnail, List<File> episodeImages) {
+        return new EpisodeImagesUploadResponse(
                 uploadThumbnail(webtoonId, thumbnail),
                 uploadEpisodeImages(webtoonId, episodeImages)
         );

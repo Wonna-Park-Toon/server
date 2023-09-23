@@ -65,8 +65,7 @@ public class EpisodeManageService implements EpisodeManageUseCase {
 
     @Override
     public void deleteEpisode(Long episodeId) {
-        Episode episode = findEpisodeById(episodeId);
-        episode.delete();
+        episodeRepository.deleteById(episodeId);
     }
 
     private Episode findEpisodeById(Long episodeId) {

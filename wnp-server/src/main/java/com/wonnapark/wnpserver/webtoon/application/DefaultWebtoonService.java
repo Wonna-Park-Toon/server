@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -27,24 +27,27 @@ public class DefaultWebtoonService {
                 .map(WebtoonSimpleResponse::from);
     }
 
-    public List<WebtoonsOnPublishDayResponse> findAllWebtoonsForEachDayOfWeek() {
-        List<WebtoonsOnPublishDayResponse> responseList = new ArrayList<>();
-        for (DayOfWeek publishDay : DayOfWeek.values()) {
-            responseList.add(WebtoonsOnPublishDayResponse.of(publishDay, findWebtoonsByPublishDayInView(publishDay)));
-        }
-
-        return responseList;
-    }
-
-    public List<WebtoonSimpleResponse> findWebtoonsByPublishDayInView(DayOfWeek publishDay) {
-        return webtoonQueryRepository.findWebtoonsByPublishDayInViewCount(publishDay).stream()
+    public List<WebtoonSimpleResponse> findWebtoonsByPublishDayOrderByViewCount(DayOfWeek publishDay) {
+        return webtoonQueryRepository.findWebtoonsByPublishDayOrderByLatestViewCount(publishDay).stream()
                 .map(WebtoonSimpleResponse::from)
                 .toList();
     }
 
-    public List<WebtoonSimpleResponse> findWebtoonsByPublishDayInPopularity(DayOfWeek publishDay){
-        return webtoonQueryRepository.findWebtoonsByPublishDayInPopularity(publishDay).stream()
+    public List<WebtoonSimpleResponse> findWebtoonsByPublishDayOrderByPopularity(DayOfWeek publishDay) {
+        return webtoonQueryRepository.findWebtoonsByPublishDayOrderByPopularity(publishDay).stream()
                 .map(WebtoonSimpleResponse::from)
+                .toList();
+    }
+
+    public List<WebtoonsOnPublishDayResponse> findAllWebtoonsOrderByViewCount() {
+        return Arrays.stream(DayOfWeek.values())
+                .map(publishDay -> WebtoonsOnPublishDayResponse.of(publishDay, findWebtoonsByPublishDayOrderByViewCount(publishDay)))
+                .toList();
+    }
+
+    public List<WebtoonsOnPublishDayResponse> findAllWebtoonsOrderByPopularity() {
+        return Arrays.stream(DayOfWeek.values())
+                .map(publishDay -> WebtoonsOnPublishDayResponse.of(publishDay, findWebtoonsByPublishDayOrderByPopularity(publishDay)))
                 .toList();
     }
 

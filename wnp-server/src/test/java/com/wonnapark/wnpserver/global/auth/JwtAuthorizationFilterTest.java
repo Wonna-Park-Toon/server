@@ -31,10 +31,10 @@ import static org.mockito.Mockito.atMostOnce;
 @ExtendWith(MockitoExtension.class)
 class JwtAuthorizationFilterTest {
 
-    JwtAuthorizationFilter jwtAuthorizationFilter;
+    private JwtAuthorizationFilter jwtAuthorizationFilter;
 
     @Mock
-    AuthenticationResolver authenticationResolver;
+    private AuthenticationResolver authenticationResolver;
 
     @BeforeEach
     void setUp() {

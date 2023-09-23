@@ -9,7 +9,7 @@ import com.wonnapark.wnpserver.episode.dto.request.EpisodeThumbnailUpdateRequest
 import com.wonnapark.wnpserver.episode.dto.request.EpisodeTitleUpdateRequest;
 import com.wonnapark.wnpserver.episode.dto.request.EpisodeUrlsUpdateRequest;
 import com.wonnapark.wnpserver.episode.dto.response.EpisodeCreationResponse;
-import com.wonnapark.wnpserver.episode.dto.response.EpisodeMediaUploadResponse;
+import com.wonnapark.wnpserver.episode.dto.response.EpisodeImagesUploadResponse;
 import com.wonnapark.wnpserver.global.auth.Admin;
 import com.wonnapark.wnpserver.global.response.ApiResponse;
 import com.wonnapark.wnpserver.global.utils.FileUtils;
@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.net.URI;
 import java.util.List;
 
+import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -45,7 +47,7 @@ public class AdminEpisodeController {
     @Admin
     @PostMapping("/images")
     @ResponseStatus(CREATED)
-    public ApiResponse<EpisodeMediaUploadResponse> createEpisodeImages(
+    public ApiResponse<EpisodeImagesUploadResponse> createEpisodeImages(
             @RequestParam("webtoonId")
             @NotNull(message = "웹툰 ID는 null일 수 없습니다.")
             String webtoonId,
@@ -54,8 +56,11 @@ public class AdminEpisodeController {
             MultipartFile thumbnail,
             @RequestPart("episodeImages")
             @NotNull(message = "에피소드 이미지는 null일 수 없습니다.")
-            List<MultipartFile> episodeImages
+            List<MultipartFile> episodeImages,
+            HttpServletResponse response
     ) {
+        response.setHeader(LOCATION, "/api/v1/admin/episode");
+
         return ApiResponse.from(episodeImageService.uploadEpisodeMedia(
                 webtoonId,
                 FileUtils.convertMultipartFileToFile(thumbnail),
@@ -75,7 +80,7 @@ public class AdminEpisodeController {
         Long episodeId = episodeManageUseCase.createEpisode(webtoonId, episodeCreationRequest);
 
         String uri = URI.create(String.format("/api/v1/common/episode/detail/%d", episodeId)).toString();
-        response.setHeader("Location", uri);
+        response.setHeader(LOCATION, uri);
 
         return ApiResponse.from(new EpisodeCreationResponse(episodeId));
     }
@@ -113,6 +118,13 @@ public class AdminEpisodeController {
     @ResponseStatus(OK)
     public void updateEpisodeUrls(@PathVariable Long id, @RequestBody @Valid EpisodeUrlsUpdateRequest request) {
         episodeManageUseCase.updateEpisodeUrls(id, request);
+    }
+
+    @Admin
+    @DeleteMapping("/{id}")
+    @ResponseStatus(OK)
+    public void deleteEpisode(@PathVariable Long id) {
+        episodeManageUseCase.deleteEpisode(id);
     }
 
 }

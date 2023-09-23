@@ -9,11 +9,12 @@ import com.wonnapark.wnpserver.webtoon.dto.response.WebtoonThumbnailResponse;
 import com.wonnapark.wnpserver.webtoon.infrastructure.WebtoonRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -26,12 +27,24 @@ public class AdminWebtoonService {
     private final String WEBTOON_THUMBNAIL_PATTERN = "webtoon/%d/thumbnail/thumbnail_IMAG21_%s.%s";
 
     @Transactional
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "webtoonsByPublishDayOrderByViewCount", allEntries = true),
+                    @CacheEvict(value = "webtoonsByPublishDayOrderByPopularity", allEntries = true)
+            }
+    )
     public WebtoonDetailResponse createWebtoonDetail(WebtoonCreateDetailRequest request) {
         Webtoon webtoon = WebtoonCreateDetailRequest.toEntity(request);
         return WebtoonDetailResponse.from(webtoonRepository.save(webtoon));
     }
 
     @Transactional
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "webtoonsByPublishDayOrderByViewCount", allEntries = true),
+                    @CacheEvict(value = "webtoonsByPublishDayOrderByPopularity", allEntries = true)
+            }
+    )
     public WebtoonThumbnailResponse updateWebtoonThumbnail(File thumbnailFile, Long webtoonId) {
         Webtoon webtoon = webtoonRepository.findById(webtoonId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(WebtoonExceptionMessage.WEBTOON_NOT_FOUND.getMessage(), webtoonId)));
@@ -42,6 +55,12 @@ public class AdminWebtoonService {
     }
 
     @Transactional
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "webtoonsByPublishDayOrderByViewCount", allEntries = true),
+                    @CacheEvict(value = "webtoonsByPublishDayOrderByPopularity", allEntries = true)
+            }
+    )
     public WebtoonDetailResponse updateWebtoonDetail(WebtoonUpdateDetailRequest request, Long webtoonId) {
         Webtoon webtoon = webtoonRepository.findById(webtoonId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(WebtoonExceptionMessage.WEBTOON_NOT_FOUND.getMessage(), webtoonId)));
@@ -58,12 +77,16 @@ public class AdminWebtoonService {
     }
 
     @Transactional
-    public LocalDateTime deleteWebtoon(Long webtoonId) {
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "webtoonsByPublishDayOrderByViewCount", allEntries = true),
+                    @CacheEvict(value = "webtoonsByPublishDayOrderByPopularity", allEntries = true)
+            }
+    )
+    public void deleteWebtoon(Long webtoonId) {
         Webtoon webtoon = webtoonRepository.findById(webtoonId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(WebtoonExceptionMessage.WEBTOON_NOT_FOUND.getMessage(), webtoonId)));
         webtoon.delete();
-
-        return webtoon.getIsDeleted();
     }
 
     /**

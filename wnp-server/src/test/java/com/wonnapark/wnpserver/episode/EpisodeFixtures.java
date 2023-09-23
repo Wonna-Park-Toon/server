@@ -45,7 +45,6 @@ public final class EpisodeFixtures {
     public static Episode episode(Webtoon webtoon) {
         Episode episode = Instancio.of(Episode.class)
                 .set(field(Episode::getWebtoon), webtoon)
-                .ignore(field(Episode::isDeleted))
                 .ignore(field(Episode::getEpisodeUrls))
                 .create();
         episode.setEpisodeUrls(episodeUrls(1L));
@@ -57,7 +56,6 @@ public final class EpisodeFixtures {
         List<Episode> episodes = Instancio.ofList(Episode.class)
                 .set(field(Episode::getWebtoon), webtoon)
                 .assign(valueOf(Episode::getId).generate(gen -> gen.longSeq().start(1L)))
-                .ignore(field(Episode::isDeleted))
                 .ignore(field(Episode::getEpisodeUrls))
                 .create();
 

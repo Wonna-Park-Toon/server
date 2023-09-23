@@ -1,5 +1,6 @@
 package com.wonnapark.wnpserver.webtoon.presentation;
 
+import com.wonnapark.wnpserver.global.auth.Admin;
 import com.wonnapark.wnpserver.global.response.ApiResponse;
 import com.wonnapark.wnpserver.global.utils.FileUtils;
 import com.wonnapark.wnpserver.webtoon.application.AdminWebtoonService;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("api/v1/admin/webtoons")
@@ -32,6 +32,7 @@ public class AdminWebtoonController {
 
     private final AdminWebtoonService adminWebtoonService;
 
+    @Admin
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<WebtoonDetailResponse> createWebtoonDetail(@RequestBody WebtoonCreateDetailRequest request, HttpServletResponse response) {
@@ -42,6 +43,7 @@ public class AdminWebtoonController {
         return ApiResponse.from(data);
     }
 
+    @Admin
     @PatchMapping("{webtoonId}/thumbnail")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<WebtoonThumbnailResponse> updateWebtoonThumbnail(
@@ -50,7 +52,7 @@ public class AdminWebtoonController {
             MultipartFile thumbnailMultipartFile,
             @PathVariable
             Long webtoonId
-    ){
+    ) {
         WebtoonThumbnailResponse response = adminWebtoonService.updateWebtoonThumbnail(
                 FileUtils.convertMultipartFileToFile(thumbnailMultipartFile),
                 webtoonId
@@ -59,6 +61,7 @@ public class AdminWebtoonController {
         return ApiResponse.from(response);
     }
 
+    @Admin
     @PatchMapping("/{webtoonId}")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<WebtoonDetailResponse> updateWebtoonDetail(@PathVariable Long webtoonId, @RequestBody WebtoonUpdateDetailRequest request) {
@@ -67,12 +70,11 @@ public class AdminWebtoonController {
         return ApiResponse.from(response);
     }
 
+    @Admin
     @DeleteMapping("/{webtoonId}")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<LocalDateTime> deleteWebtoon(@PathVariable Long webtoonId) {
-        LocalDateTime deletedDateTime = adminWebtoonService.deleteWebtoon(webtoonId);
-
-        return ApiResponse.from(deletedDateTime);
+    public void deleteWebtoon(@PathVariable Long webtoonId) {
+        adminWebtoonService.deleteWebtoon(webtoonId);
     }
 
 }

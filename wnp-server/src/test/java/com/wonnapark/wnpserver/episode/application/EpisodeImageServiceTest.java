@@ -1,6 +1,6 @@
 package com.wonnapark.wnpserver.episode.application;
 
-import com.wonnapark.wnpserver.episode.dto.response.EpisodeMediaUploadResponse;
+import com.wonnapark.wnpserver.episode.dto.response.EpisodeImagesUploadResponse;
 import com.wonnapark.wnpserver.media.S3MediaService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,11 +53,11 @@ class EpisodeImageServiceTest {
         );
 
         // when
-        EpisodeMediaUploadResponse episodeMediaUploadResponse = episodeImageService.uploadEpisodeMedia(webtoonId, thumbnail, episodeImages);
+        EpisodeImagesUploadResponse episodeImagesUploadResponse = episodeImageService.uploadEpisodeMedia(webtoonId, thumbnail, episodeImages);
 
         // then
-        assertThat(episodeMediaUploadResponse.thumbnailUrl()).isEqualTo(expectedThumbnailUrl);
-        assertThat(episodeMediaUploadResponse.urls()).isEqualTo(expectedImageUrls);
+        assertThat(episodeImagesUploadResponse.thumbnailUrl()).isEqualTo(expectedThumbnailUrl);
+        assertThat(episodeImagesUploadResponse.urls()).isEqualTo(expectedImageUrls);
 
         int thumbnailUploadTime = 1;
         then(s3MediaService).should(

@@ -20,13 +20,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.time.DayOfWeek;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.atMostOnce;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultWebtoonServiceTest {
@@ -59,14 +59,15 @@ class DefaultWebtoonServiceTest {
     @DisplayName("요일별 웹툰 목록을 조회할 수 있다.")
     void findWebtoonsByPublishDay(DayOfWeek publishDay) {
         // given
-        List<Webtoon> webtoons = WebtoonFixtures.createWebtoonsOnPublishDay(publishDay);
-        given(webtoonQueryRepository.findWebtoonsByPublishDayInViewCount(eq(publishDay))).willReturn(webtoons);
+        List<Webtoon> webtoonsOnPublishDay = WebtoonFixtures.createWebtoonsOnPublishDay(publishDay);
+        given(webtoonQueryRepository.findWebtoonsByPublishDayOrderByLatestViewCount(eq(publishDay))).willReturn(webtoonsOnPublishDay);
 
         // when
-        List<WebtoonSimpleResponse> responsesOnDayOfWeek = defaultWebtoonService.findWebtoonsByPublishDayInView(publishDay);
+        List<WebtoonSimpleResponse> responsesOnDayOfWeek = defaultWebtoonService.findWebtoonsByPublishDayOrderByViewCount(publishDay);
 
         // then
-        assertThat(responsesOnDayOfWeek).isEqualTo(webtoons.stream().map(WebtoonSimpleResponse::from).toList());
+        then(webtoonQueryRepository).should(atMostOnce()).findWebtoonsByPublishDayOrderByLatestViewCount(publishDay);
+        assertThat(responsesOnDayOfWeek).isEqualTo(webtoonsOnPublishDay.stream().map(WebtoonSimpleResponse::from).toList());
         // TODO: 2023-09-17 정렬 결과 검증 추가
     }
 

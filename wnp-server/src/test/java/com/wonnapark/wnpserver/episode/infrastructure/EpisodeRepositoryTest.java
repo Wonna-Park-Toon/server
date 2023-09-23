@@ -124,7 +124,6 @@ class EpisodeRepositoryTest {
         Episode episode = Instancio.of(Episode.class)
                 .set(field(Episode::getWebtoon), webtoon)
                 .ignore(field(Episode::getId))
-                .ignore(field(Episode::isDeleted))
                 .ignore(field(Episode::getEpisodeUrls))
                 .ignore(field(Episode::getViewCount))
                 .create();

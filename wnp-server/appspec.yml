@@ -1,0 +1,23 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /home/ubuntu/wonnapark
+    overwrite: yes
+
+permissions:
+  - object: /home/ubuntu/wonnapark
+    owner: ubuntu
+    group: ubuntu
+hooks:
+  AfterInstall:
+    - location: scripts/run_new_was.sh
+      timeout: 60
+      runas: ubuntu
+    - location: scripts/health_check.sh
+      timeout: 60
+      runas: ubuntu
+    - location: scripts/switch_kill.sh
+      timeout: 60
+      runas: ubuntu

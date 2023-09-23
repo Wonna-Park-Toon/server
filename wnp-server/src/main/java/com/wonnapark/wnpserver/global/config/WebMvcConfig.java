@@ -26,11 +26,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(jwtAuthenticationInterceptor);
+        registry.addInterceptor(jwtAuthenticationInterceptor)
+                .addPathPatterns("api/**/admin/**");
     }
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new OAuthProviderConverter());
     }
+    
 }

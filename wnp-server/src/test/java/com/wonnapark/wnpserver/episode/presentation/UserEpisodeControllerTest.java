@@ -1,27 +1,20 @@
 package com.wonnapark.wnpserver.episode.presentation;
 
-import com.wonnapark.wnpserver.auth.application.AuthenticationResolver;
+import com.wonnapark.wnpserver.config.ControllerTestConfig;
 import com.wonnapark.wnpserver.episode.Episode;
 import com.wonnapark.wnpserver.episode.EpisodeFixtures;
-import com.wonnapark.wnpserver.episode.application.EpisodeFindUseCase;
 import com.wonnapark.wnpserver.episode.dto.response.EpisodeDetailFormResponse;
 import com.wonnapark.wnpserver.episode.dto.response.EpisodeListFormResponse;
 import com.wonnapark.wnpserver.global.auth.AuthFixtures;
 import com.wonnapark.wnpserver.global.auth.Authentication;
-import com.wonnapark.wnpserver.global.auth.AuthorizedArgumentResolver;
 import com.wonnapark.wnpserver.global.common.UserInfo;
 import com.wonnapark.wnpserver.webtoon.Webtoon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
@@ -29,6 +22,9 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.docume
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.resourceDetails;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -43,18 +39,8 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserEpisodeController.class)
-@AutoConfigureRestDocs
-class UserEpisodeControllerTest {
+class UserEpisodeControllerTest extends ControllerTestConfig {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @MockBean
-    private EpisodeFindUseCase episodeFindUseCase;
-    @MockBean
-    private AuthenticationResolver authenticationResolver;
-    @MockBean
-    private AuthorizedArgumentResolver authorizedArgumentResolver;
     private UserInfo userInfo;
 
     @BeforeEach
@@ -64,6 +50,7 @@ class UserEpisodeControllerTest {
 
         given(authorizedArgumentResolver.supportsParameter(any())).willReturn(true);
         given(authorizedArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(userInfo);
+        given(jwtAuthenticationInterceptor.preHandle(any(), any(), any())).willReturn(true);
     }
 
     @Test
@@ -76,6 +63,7 @@ class UserEpisodeControllerTest {
         given(episodeFindUseCase.findEpisodeDetailForm(userInfo.userId(), episodeId)).willReturn(EpisodeDetailFormResponse.from(episode));
         // when // then
         this.mockMvc.perform(get("/api/v1/user/episode/{episodeId}/detail", episodeId)
+                        .header(AUTHORIZATION, TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -83,6 +71,9 @@ class UserEpisodeControllerTest {
                         resourceDetails().tag("에피소드-유저").description("에피소드 상세 정보 불러오기"),
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName(AUTHORIZATION).description("엑세스 토큰")
+                        ),
                         responseFields(
                                 fieldWithPath("data.id").type(NUMBER).description("에피소드 ID"),
                                 fieldWithPath("data.artistComment").type(STRING).description("작가의 말"),
@@ -104,6 +95,7 @@ class UserEpisodeControllerTest {
                 .willReturn(new PageImpl<>(episodes, pageable, episodes.size()).map(EpisodeListFormResponse::from));
         // when // then
         mockMvc.perform(get("/api/v1/user/episode/list")
+                        .header(AUTHORIZATION, TOKEN)
                         .param("webtoonId", String.valueOf(webtoon.getId()))
                         .param("page", "0")
                         .param("direction", "DESC"))
@@ -113,6 +105,9 @@ class UserEpisodeControllerTest {
                         resourceDetails().tag("에피소드-유저").description("에피소드 리스트 불러오기"),
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName(AUTHORIZATION).description("엑세스 토큰")
+                        ),
                         queryParameters(
                                 parameterWithName("webtoonId").description("웹툰 ID"),
                                 parameterWithName("page").description("페이지 번호"),

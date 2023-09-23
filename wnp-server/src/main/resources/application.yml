@@ -41,7 +41,7 @@ oauth:
 
 springdoc:
   swagger-ui:
-    path: ${SPRINGDOC_SWAGGER_UI_PATH}
+    url: ${SPRINGDOC_SWAGGER_UI_URL}
 
 cloud:
   aws:

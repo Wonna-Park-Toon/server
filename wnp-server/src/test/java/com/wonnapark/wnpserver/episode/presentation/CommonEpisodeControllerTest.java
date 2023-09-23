@@ -1,66 +1,34 @@
 package com.wonnapark.wnpserver.episode.presentation;
 
-import com.wonnapark.wnpserver.auth.application.AuthenticationResolver;
+import com.wonnapark.wnpserver.config.ControllerTestConfig;
 import com.wonnapark.wnpserver.episode.Episode;
-import com.wonnapark.wnpserver.episode.application.EpisodeFindUseCase;
 import com.wonnapark.wnpserver.episode.dto.response.EpisodeDetailFormResponse;
 import com.wonnapark.wnpserver.episode.dto.response.EpisodeListFormResponse;
-import com.wonnapark.wnpserver.global.auth.AuthorizedArgumentResolver;
-import com.wonnapark.wnpserver.global.auth.JwtAuthenticationInterceptor;
 import com.wonnapark.wnpserver.webtoon.Webtoon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.resourceDetails;
-import static com.wonnapark.wnpserver.episode.EpisodeFixtures.episode;
-import static com.wonnapark.wnpserver.episode.EpisodeFixtures.episodes;
-import static com.wonnapark.wnpserver.episode.EpisodeFixtures.pageable;
-import static com.wonnapark.wnpserver.episode.EpisodeFixtures.webtoon;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static com.wonnapark.wnpserver.episode.EpisodeFixtures.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(CommonEpisodeController.class)
-@AutoConfigureRestDocs
-class CommonEpisodeControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-    @MockBean
-    private EpisodeFindUseCase episodeFindUseCase;
-    @MockBean
-    private AuthenticationResolver authenticationResolver;
-    @MockBean
-    private AuthorizedArgumentResolver authorizedArgumentResolver;
-    @MockBean
-    private JwtAuthenticationInterceptor jwtAuthenticationInterceptor;
+class CommonEpisodeControllerTest extends ControllerTestConfig {
 
     @BeforeEach
     void setup() throws Exception {

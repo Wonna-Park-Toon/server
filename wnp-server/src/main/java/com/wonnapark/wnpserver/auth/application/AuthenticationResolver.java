@@ -49,11 +49,11 @@ public class AuthenticationResolver {
     public void validateRefreshToken(String token, Long userId) {
         if (isValidToken(token)) {
             RefreshToken refreshToken = refreshTokenRepository.findById(userId)
-                    .orElseThrow(() -> new JwtInvalidException(ErrorCode.EXPIRED_TOKEN));
+                    .orElseThrow(() -> new JwtInvalidException(ErrorCode.EXPIRED_REFRESH_TOKEN));
             if (refreshToken.getValue().equals(token))
                 return;
         }
-        throw new JwtInvalidException(ErrorCode.EXPIRED_TOKEN);
+        throw new JwtInvalidException(ErrorCode.EXPIRED_REFRESH_TOKEN);
     }
 
     private boolean isValidToken(String token) {
@@ -65,7 +65,7 @@ public class AuthenticationResolver {
                     .getBody();
             return true;
         } catch (ExpiredJwtException expiredJwtException) {
-            throw new JwtInvalidException(ErrorCode.EXPIRED_TOKEN, expiredJwtException);
+            throw new JwtInvalidException(ErrorCode.EXPIRED_ACCESS_TOKEN, expiredJwtException);
         } catch (SignatureException signatureException) {
             throw new JwtInvalidException(ErrorCode.WRONG_SIGNATURE_TOKEN, signatureException);
         } catch (MalformedJwtException | UnsupportedJwtException unsupportedJwtException) {

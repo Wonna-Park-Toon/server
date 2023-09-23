@@ -14,7 +14,8 @@ public enum ErrorCode {
 
     // Token
     TOKEN_NOT_FOUND(404, "T001", "토큰을 찾을 수 없습니다."),
-    EXPIRED_TOKEN(400, "T002", "만료된 토큰입니다."),
+    EXPIRED_ACCESS_TOKEN(400, "T002", "만료된 토큰입니다."),
+    EXPIRED_REFRESH_TOKEN(400, "T002", "토큰이 만료되었습니다. 다시 로그인을 진행해 주세요."),
     UNSUPPORTED_TOKEN(400, "T003", "잘못된 형식의 토큰입니다."),
     WRONG_SIGNATURE_TOKEN(400, "T004", "변조된 토큰입니다. 토큰이 탈취되었을 수도 있습니다."),
     LOGOUT_TOKEN(400, "T005", "로그아웃 처리된 토큰입니다. 로그인을 재시도 해주세요.");
