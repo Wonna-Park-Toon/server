@@ -63,6 +63,7 @@ public class JwtTokenService {
         int identifyNum = generator.nextInt();
 
         String refreshToken = Jwts.builder()
+                .setSubject(String.valueOf(request.userId()))
                 .setIssuer(String.format(TokenConstants.ISSUER + "%d", identifyNum))
                 .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .setExpiration(expiredAt)

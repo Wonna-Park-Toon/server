@@ -40,7 +40,7 @@ class AuthControllerTest extends ControllerTestConfig {
 
         willDoNothing().given(authenticationResolver).validateAccessToken(any());
         given(authenticationResolver.extractAuthentication(any())).willReturn(authentication);
-        willDoNothing().given(authenticationResolver).validateRefreshToken(any(), any());
+        willDoNothing().given(authenticationResolver).validateRefreshToken(any());
 
         given(jwtAuthenticationInterceptor.preHandle(any(), any(), any())).willReturn(true);
 
@@ -80,7 +80,7 @@ class AuthControllerTest extends ControllerTestConfig {
 
         willDoNothing().given(authenticationResolver).validateAccessToken(any());
         given(authenticationResolver.extractAuthentication(any())).willReturn(authentication);
-        willDoNothing().given(authenticationResolver).validateRefreshToken(any(), any());
+        willDoNothing().given(authenticationResolver).validateRefreshToken(any());
 
         given(jwtAuthenticationInterceptor.preHandle(any(), any(), any())).willReturn(true);
 
