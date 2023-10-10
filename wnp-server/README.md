@@ -2,17 +2,16 @@
 
 **데브코스 백엔드 4기 승훈팀: 네이버웹툰 클론코딩 프로젝트**
 
-<br>
-
-## 프로젝트목표
-
--
-
 ## 팀원 소개
 
 | <img src="https://avatars.githubusercontent.com/u/102007066?v=4"> | <img src="https://avatars.githubusercontent.com/u/70051888?v=4"/> | <img src="https://avatars.githubusercontent.com/u/98159941?v=4"/> | <img src="https://avatars.githubusercontent.com/u/60502370?v=4"> | <img src="https://avatars.githubusercontent.com/u/61923768?v=4"> |
 |:-----------------------------------------------------------------:|:-----------------------------------------------------------------:|:-----------------------------------------------------------------:|:----------------------------------------------------------------:|:----------------------------------------------------------------:|
 |                  [나영경](https://github.com/na-yk)                  |              [박상민](https://github.com/smart-sangmin)              |                 [원건희](https://github.com/weonest)                 |           [멘토<br>함승훈](https://github.com/seung-hun-h)            |            [서브멘토<br>유도진](https://github.com/dojinyou)            |
+
+## 프로젝트 목표
+
+- 단순 CRUD가 아닌 어떻게 좋은 비즈니스 로직을 구현할 수 있을지 고민하자!
+- CS 기반의 의사결정을 하자!
 
 ## 팀 규칙
 
@@ -60,19 +59,15 @@
 
 ## 문서
 
-### 기능
-
-기능 작성하자
-
 ### API 명세서
 
-Swagger 넣자
+[Swagger](http://54.180.66.111/swagger-ui/index.html)
 
 ## 설계
 
 ### ERD
 
-![image](https://github.com/Wonna-Park-Toon/server/assets/70051888/91474b80-4965-49a9-a7a3-5489b4ee2223)
+![image](https://github.com/Wonna-Park-Toon/server/assets/70051888/1b6121ce-d228-4923-9f80-0f1d82db533e)
 
 <br>
 
