@@ -17,9 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(TestContainerConfig.class)
 @SpringBootTest
@@ -112,7 +110,7 @@ class AuthIntegrationTest {
         Authentication authentication = authenticationResolver.extractAuthentication(accessToken);
 
         // then
-        assertThatNoException().isThrownBy(() -> authenticationResolver.validateRefreshToken(refreshToken, authentication.userId()));
+        assertThatNoException().isThrownBy(() -> authenticationResolver.validateRefreshToken(refreshToken));
     }
 
     @Nested
@@ -123,7 +121,7 @@ class AuthIntegrationTest {
         @DisplayName("RefreshToken 자체가 잘못된 경우 에러를 반환")
         void validateWrongRefreshToken() {
             assertThatThrownBy(() ->
-                    authenticationResolver.validateRefreshToken(Instancio.create(String.class), Instancio.create(Long.class)))
+                    authenticationResolver.validateRefreshToken(Instancio.create(String.class)))
                     .isInstanceOf(JwtInvalidException.class);
         }
 
@@ -132,7 +130,7 @@ class AuthIntegrationTest {
         void validateNotEqualRefreshToken() {
             // given
             AuthTokenRequest authTokenRequest = Instancio.create(AuthTokenRequest.class);
-            Long userId = authTokenRequest.userId();
+//            Long userId = authTokenRequest.userId();
             RefreshTokenResponse refreshTokenResponse = jwtTokenService.generateRefreshToken(authTokenRequest);
             String wrongToken = refreshTokenResponse.refreshToken();
 
@@ -140,7 +138,7 @@ class AuthIntegrationTest {
             jwtTokenService.generateRefreshToken(authTokenRequest);
 
             // then
-            assertThatThrownBy(() -> authenticationResolver.validateRefreshToken(wrongToken, userId))
+            assertThatThrownBy(() -> authenticationResolver.validateRefreshToken(wrongToken))
                     .isInstanceOf(JwtInvalidException.class);
         }
     }

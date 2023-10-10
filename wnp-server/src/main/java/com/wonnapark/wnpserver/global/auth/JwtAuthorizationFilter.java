@@ -52,18 +52,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String accessToken = extractTokenFromHeader(request, HttpHeaders.AUTHORIZATION);
         try {
-            authenticationResolver.validateAccessToken(accessToken);
-            Authentication authentication = authenticationResolver.extractAuthentication(accessToken);
-            AuthenticationContextHolder.setAuthenticationHolder(authentication);
+            if (!path.equals(REISSUE_URI)) {
+                authenticationResolver.validateAccessToken(accessToken);
+                Authentication authentication = authenticationResolver.extractAuthentication(accessToken);
+                AuthenticationContextHolder.setAuthenticationHolder(authentication);
+            }
 
             if (path.equals(REISSUE_URI) || path.equals(LOGOUT_URI)) {
                 String refreshToken = extractTokenFromHeader(request, TokenConstants.REFRESH_TOKEN);
-                authenticationResolver.validateRefreshToken(refreshToken, authentication.userId());
+                authenticationResolver.validateRefreshToken(refreshToken);
             }
 
             filterChain.doFilter(request, response);
-        } catch (
-                JwtInvalidException jwtInvalidException) {
+        } catch (JwtInvalidException jwtInvalidException) {
             setErrorResponse(response, jwtInvalidException);
         } finally {
             AuthenticationContextHolder.clearContext();

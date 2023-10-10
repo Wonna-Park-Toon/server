@@ -104,14 +104,29 @@ class JwtAuthorizationFilterTest {
         assertThat(status).isEqualTo(response.getStatus());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings =
-            {"/api/v1/auth/reissue",
-                    "/api/v1/auth/logout"})
-    @DisplayName("재발급, 로그아웃 요청시 액세스 토큰과 리프레시 토큰 모두 검증한다.")
-    void validateAccessAndRefreshTokenWhenRequestIsReissueOrLogout(String requestURI) throws ServletException, IOException {
+    @Test
+    @DisplayName("재발급 요청시 리프레시 토큰을 검증한다.")
+    void validateAccessAndRefreshTokenWhenRequestIsReissue() throws ServletException, IOException {
         // given
-        request.setRequestURI(requestURI);
+        request.setRequestURI("/api/v1/auth/reissue");
+        String refreshToken = "refreshToken";
+        request.addHeader(TokenConstants.REFRESH_TOKEN, refreshToken);
+
+        willDoNothing().given(authenticationResolver).validateRefreshToken(any());
+
+        // when
+        jwtAuthorizationFilter.doFilterInternal(request, response, filterChain);
+
+        // then
+        then(authenticationResolver).should(atLeastOnce()).validateRefreshToken(any());
+        then(filterChain).should(atMostOnce()).doFilter(request, response);
+    }
+
+    @Test
+    @DisplayName("로그아웃 요청시 액세스 토큰과 리프레시 토큰 모두 검증한다.")
+    void validateAccessAndRefreshTokenWhenRequestIsLogout() throws ServletException, IOException {
+        // given
+        request.setRequestURI("/api/v1/auth/logout");
         String accessToken = "accessToken";
         String refreshToken = "refreshToken";
         request.addHeader(HttpHeaders.AUTHORIZATION, accessToken);
@@ -120,25 +135,43 @@ class JwtAuthorizationFilterTest {
 
         willDoNothing().given(authenticationResolver).validateAccessToken(any());
         given(authenticationResolver.extractAuthentication(any())).willReturn(authentication);
-        willDoNothing().given(authenticationResolver).validateRefreshToken(any(), any());
+        willDoNothing().given(authenticationResolver).validateRefreshToken(any());
 
         // when
         jwtAuthorizationFilter.doFilterInternal(request, response, filterChain);
 
         // then
         then(authenticationResolver).should(atLeastOnce()).validateAccessToken(any());
-        then(authenticationResolver).should(atLeastOnce()).validateRefreshToken(any(), any());
+        then(authenticationResolver).should(atLeastOnce()).validateRefreshToken(any());
         then(filterChain).should(atMostOnce()).doFilter(request, response);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings =
-            {"/api/v1/auth/reissue",
-                    "/api/v1/auth/logout"})
-    @DisplayName("재발급, 로그아웃 요청시 리프레시 토큰이 올바르지 않다면 에러를 지정하고 반환한다.")
-    void setErrorResponseWhenRefreshTokenIsWrong(String requestURI) throws ServletException, IOException {
+    @Test
+    @DisplayName("재발급 요청시 리프레시 토큰이 올바르지 않다면 에러를 지정하고 반환한다.")
+    void setErrorResponseWhenRefreshTokenIsNotValid() throws ServletException, IOException {
         // given
-        request.setRequestURI(requestURI);
+        request.setRequestURI("/api/v1/auth/reissue");
+        String refreshToken = "wrongToken";
+        request.addHeader(TokenConstants.REFRESH_TOKEN, refreshToken);
+        ErrorCode errorCode = ErrorCode.UNSUPPORTED_TOKEN;
+        int status = errorCode.getValue();
+
+        willThrow(new JwtInvalidException(errorCode)).given(authenticationResolver).validateRefreshToken(any());
+
+        // when
+        jwtAuthorizationFilter.doFilterInternal(request, response, filterChain);
+
+        // then
+        then(authenticationResolver).should(atLeastOnce()).validateRefreshToken(any());
+        then(filterChain).shouldHaveNoInteractions();
+        assertThat(status).isEqualTo(response.getStatus());
+    }
+
+    @Test
+    @DisplayName("재발급 요청시 리프레시 토큰이 올바르지 않다면 에러를 지정하고 반환한다.")
+    void setErrorResponseWhenRefreshTokenIsWrong() throws ServletException, IOException {
+        // given
+        request.setRequestURI("/api/v1/auth/logout");
         String accessToken = "accessToken";
         String refreshToken = "wrongToken";
         request.addHeader(HttpHeaders.AUTHORIZATION, accessToken);
@@ -149,14 +182,14 @@ class JwtAuthorizationFilterTest {
 
         willDoNothing().given(authenticationResolver).validateAccessToken(any());
         given(authenticationResolver.extractAuthentication(any())).willReturn(authentication);
-        willThrow(new JwtInvalidException(errorCode)).given(authenticationResolver).validateRefreshToken(any(), any());
+        willThrow(new JwtInvalidException(errorCode)).given(authenticationResolver).validateRefreshToken(any());
 
         // when
         jwtAuthorizationFilter.doFilterInternal(request, response, filterChain);
 
         // then
         then(authenticationResolver).should(atLeastOnce()).validateAccessToken(any());
-        then(authenticationResolver).should(atLeastOnce()).validateRefreshToken(any(), any());
+        then(authenticationResolver).should(atLeastOnce()).validateRefreshToken(any());
         then(filterChain).shouldHaveNoInteractions();
         assertThat(status).isEqualTo(response.getStatus());
     }
