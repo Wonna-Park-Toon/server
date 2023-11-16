@@ -2,6 +2,8 @@
 
 **데브코스 백엔드 4기 승훈팀: 네이버웹툰 클론코딩 프로젝트**
 
+진행 기간: 2023. 08. 29 ~ 2023. 09. 22
+
 ## 팀원 소개
 
 | <img src="https://avatars.githubusercontent.com/u/102007066?v=4"> | <img src="https://avatars.githubusercontent.com/u/70051888?v=4"/> | <img src="https://avatars.githubusercontent.com/u/98159941?v=4"/> | <img src="https://avatars.githubusercontent.com/u/60502370?v=4"> | <img src="https://avatars.githubusercontent.com/u/61923768?v=4"> |
